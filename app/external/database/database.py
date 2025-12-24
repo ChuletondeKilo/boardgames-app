@@ -42,7 +42,11 @@ engine = create_async_engine(
     echo=settings.echo,  # Set to True in .env to see SQL queries
     pool_size=settings.pool_size,
     max_overflow=settings.max_overflow,
-    pool_pre_ping=True,  # Verify connections are alive before using
+    pool_timeout=settings.pool_timeout,  # Wait time for available connection
+    pool_pre_ping=settings.pool_pre_ping,  # Verify connections are alive before using
+    connect_args={
+        "ssl": True
+    }
 )
 
 

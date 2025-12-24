@@ -39,7 +39,7 @@ class DatabaseSettings(BaseSettings):
         validation_alias="DATABASE_URL",
         description="PostgreSQL database URL with asyncpg driver"
     )
-    
+
     # Optional: Connection pool settings for production
     pool_size: int = Field(
         default=5,
@@ -53,6 +53,18 @@ class DatabaseSettings(BaseSettings):
         ge=0,
         le=50,
         description="Max connections that can be created beyond pool_size"
+    )
+
+    pool_timeout: int = Field(
+        default=30,
+        ge=0,
+        le=60,
+        description="Wait 30s for available connection"
+    )
+    
+    pool_pre_ping: bool = Field(
+        default=True,
+        description="Test connection before using"
     )
     
     # Echo SQL queries to console (useful for debugging)
