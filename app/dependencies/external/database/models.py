@@ -17,11 +17,11 @@ You write:
     game = await db.get(BoardGame, 1)
 """
 
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Optional
 
-from sqlalchemy import String, Text, Integer
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy import String, Text, Integer, ForeignKey
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from .database import Base
 
@@ -86,16 +86,7 @@ class BoardGame(Base):
     # - NUMERIC(3, 1) allows values like 7.5 (3 digits total, 1 after decimal)
     rating: Mapped[Optional[float]] = mapped_column(nullable=True)
     
-    # Timestamps
-    # - Automatically set when record is created/updated
-    # - default= runs on the Python side (when object is created)
-    # - These are great for auditing
-    created_at: Mapped[datetime] = mapped_column(default=datetime.utcnow, nullable=False)
-    updated_at: Mapped[datetime] = mapped_column(
-        default=datetime.utcnow,
-        onupdate=datetime.utcnow,  # Auto-update on any modification
-        nullable=False
-    )
+    users_games: Mapped["UsersGames"] = relationship(back_populates="boardgame_id")
     
     def __repr__(self) -> str:
         """String representation for debugging"""
@@ -103,10 +94,24 @@ class BoardGame(Base):
 
 
 # Add more models as your application grows:
-# class User(Base):
-#     __tablename__ = "users"
-#     ...
-#
-# class Review(Base):
-#     __tablename__ = "reviews"
-#     ...
+class User(Base):
+    __tablename__ = "users"
+    
+    id: Mapped[int] = mapped_column(primary_key=True)
+    name: Mapped[str] = mapped_column(String(200), nullable=False, index=True)
+    surname: Mapped[str] = mapped_column(String(200), nullable=False, index=True)
+    email: Mapped[str] = mapped_column(String(200), nullable=False, index=True)
+
+    users_games: Mapped["UsersGames"] = relationship(back_populates="user_id")
+  
+
+class UsersGames(Base):
+    __tablename__ = "users_games"
+    
+    id: Mapped[int] = mapped_column(primary_key=True)
+    boardgame_id: Mapped[int] = mapped_column(ForeignKey("boardgames.id"))
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
+
+    boardgame_map: Mapped["BoardGame"] = relationship(back_populates="users_games")
+    user_map: Mapped["User"] = relationship(back_populates="users_games")
+

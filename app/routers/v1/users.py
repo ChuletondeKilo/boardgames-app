@@ -1,7 +1,10 @@
 from fastapi import APIRouter, HTTPException
 import httpx
 
-router = APIRouter()
+router = APIRouter(
+    prefix="/users",
+    tags=["Users"]
+)
 
 @router.get("/data")
 async def get_data():

@@ -17,6 +17,7 @@ Example URL structure:
 
 from fastapi import APIRouter
 
+from .users import router as users_router
 from .boardgames import router as boardgames_router
 
 # Create the main v1 router
@@ -25,8 +26,6 @@ v1_router = APIRouter()
 
 # Include all v1 routers
 v1_router.include_router(boardgames_router)
+v1_router.include_router(users_router)
 
-# As you add more features, include them here:
-# v1_router.include_router(users_router)
-# v1_router.include_router(reviews_router)
-# v1_router.include_router(auth_router)
+__all__ = ["v1_router"]

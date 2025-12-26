@@ -12,14 +12,16 @@ These are the four basic operations for any database-backed API:
 - UPDATE: PATCH /games/{id} (modify existing)
 - DELETE: DELETE /games/{id} (remove)
 """
+from typing import Annotated
 
-from fastapi import APIRouter, HTTPException, status
+from fastapi import APIRouter, HTTPException, status, Query, Depends
 from sqlalchemy import select, func
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.external.database import BoardGame, DatabaseSession
+from app.dependencies.external.database.models import BoardGame
+from app.dependencies.external.database import DatabaseSession
 
-from .schemas import (
+from .dtos import (
     BoardGameCreate,
     BoardGameUpdate,
     BoardGameResponse,
@@ -46,7 +48,7 @@ router = APIRouter(prefix="/games", tags=["Board Games"])
 )
 async def create_game(
     game_data: BoardGameCreate,
-    db: DatabaseSession,
+    db: DatabaseSession
 ) -> BoardGame:
     """
     Creates a new board game.
@@ -89,9 +91,9 @@ async def create_game(
     description="Retrieve a list of all board games with optional pagination"
 )
 async def get_games(
-    skip: int = 0,
-    limit: int = 100,
-    db: DatabaseSession = None,
+    db: DatabaseSession,
+    skip: Annotated[int, Query()] = 0,
+    limit: Annotated[int, Query()] = 100
 ) -> BoardGameListResponse:
     """
     Retrieves a paginated list of board games.

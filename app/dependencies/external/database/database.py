@@ -23,7 +23,10 @@ from sqlalchemy.ext.asyncio import (
     async_sessionmaker,
     create_async_engine,
 )
-from sqlalchemy.orm import DeclarativeBase
+from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
+from sqlalchemy import DateTime
+
+from datetime import datetime, timezone
 
 from .settings import settings
 
@@ -88,6 +91,18 @@ class Base(DeclarativeBase):
             id: Mapped[int] = mapped_column(primary_key=True)
             name: Mapped[str] = mapped_column(String(100))
     """
+
+    # Timestamps
+    # - Automatically set when record is created/updated
+    # - default= runs on the Python side (when object is created)
+    # - These are great for auditing
+    created_at: Mapped[datetime] = mapped_column(default=datetime.now(timezone.utc), nullable=False)
+    updated_at: Mapped[datetime] = mapped_column(
+        default=datetime.now(timezone.utc),
+        onupdate=datetime.now(timezone.utc),  # Auto-update on any modification
+        nullable=False
+    )
+
     pass
 
 
